@@ -1,0 +1,53 @@
+<div class="dashboard-container">
+    <div class="chart-grid">
+  
+      <!-- Students per Major -->
+      <div class="chart-box">
+        <h3>🧑‍🎓 Top 3 hot majors</h3>
+        <canvas baseChart [data]="top3Major" [type]="'bar'" [options]="barChartOptions"></canvas>
+      </div>
+  
+      <!-- Students per Major -->
+      <div class="chart-box">
+        <h3>🧑‍🎓 Top 3 least majors</h3>
+        <canvas baseChart [data]="bottom3Major" [type]="'bar'" [options]="barChartOptions"></canvas>
+      </div>
+
+      <!-- Tutors per Major
+      <div class="chart-box">
+        <h3>👨‍🏫 Tutors per Major</h3>
+        <canvas baseChart [data]="tutorsMajorChartData" [type]="'doughnut'" [options]="pieChartOptions"></canvas>
+      </div> -->
+  
+      <!-- Total Accounts -->
+      <div class="chart-box">
+        <h3>
+          👥 Total Accounts
+          <span style="color: #6A1B9A; font-weight: 600">({{ totalAccounts }})</span>
+        </h3>
+        
+        <canvas baseChart [data]="newAccountsChartData" [type]="'bar'" [options]="barChartOptions"></canvas>
+      </div>
+  
+      <!-- Blogs by Month -->
+      <div class="chart-box">
+        <h3>
+          📝 Blogs Created Per Month
+          <span style="color: #6A1B9A; font-weight: 600">({{ totalBlogs }})</span>
+        </h3>      
+        <canvas baseChart [data]="newBlogsChartData" [type]="'line'" [options]="lineChartOptions"></canvas>
+      </div>
+
+
+      <!-- PaymentChartData -->
+      <div class="chart-box">
+        <h3>
+          📝 Amount Per Month
+          <span style="color: #6A1B9A; font-weight: 600">({{ totalPaymentsAmount }})</span>
+        </h3>      
+        <canvas baseChart [data]="newpaymentChartData" [type]="'line'" [options]="lineChartOptions"></canvas>
+      </div>
+  
+    </div>
+  </div>
+  

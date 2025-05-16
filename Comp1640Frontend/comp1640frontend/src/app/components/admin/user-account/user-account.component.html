@@ -1,0 +1,160 @@
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="form-control" placeholder="Search by username" [(ngModel)] = "usernameSearch" >
+    </div>
+    <button class="btn btn-primary ms-3" (click) ="searchByUsername()">Search</button>
+</div>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>User Account</h3>
+        <button class="btn btn-primary"  (click)="openModal()">+ Create user</button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary me-2" (click)="filterByRole('ALL')">All</button>
+        <button class="btn btn-outline-success me-2" (click)="filterByRole('STUDENT')">Student</button>
+        <button class="btn btn-outline-info me-2" (click)="filterByRole('TUTOR')">Tutor</button>
+        <button class="btn btn-outline-danger me-2" (click)="filterByRole('ADMIN')">Admin</button>
+    </div>
+
+    <table class="table table-bordered table-hover shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>No</th>
+                <th>User name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor ="let user of users; let i = index ">
+                    <td class="clickable-cell" (click)="checkThisGuy(user)">{{i + 1}}</td>
+                    <td class="clickable-cell" (click)="checkThisGuy(user)">{{user.username}}</td>
+                    <td class="clickable-cell" (click)="checkThisGuy(user)">{{user.email}}</td>
+                    <td class="clickable-cell" (click)="checkThisGuy(user)">{{user.password}}</td>
+                    <td class="clickable-cell" (click)="checkThisGuy(user)">{{user.role}}</td>
+
+
+                <td>
+                    <button class="btn btn-warning btn-sm me-2" (click)="updateUserAccount(user)">
+                        Update
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteUserAccount(user)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+
+
+<div class="modal" id="myModal" #myModal>
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">New User Account</h5>
+                <button type="button" class="btn-close" aria-label="Đóng" (click)="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                    <form  [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                            <div class="mb-2">
+                                <input type="text" class="form-control" formControlName="username" id="username" placeholder="Username">
+                            </div>
+                            <div class="mb-2">
+                                <input class="form-control" formControlName="password" id="password" rows="2" placeholder="Password">
+                            </div>
+
+                            <div class="mb-2">
+                                <input class="form-control" formControlName="email" id="email" rows="2" placeholder="Email">
+                            </div>
+
+                            <div class="mb-2">
+                                <input class="form-control" formControlName="name" id="name" rows="2" placeholder="Name">
+                            </div>
+
+                            <div class="mb-2">
+                                <input  type="date" class="form-control" formControlName="birthday" id="birthday" rows="2" placeholder="Birthday">
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="imageFile">Image</label><br>
+                                <input type="file" id="imageFile" class="form-control" (change)="onFileSelected($event)" formControlName="imageFile" required>
+                            </div>
+
+                            <div class="mb-2">
+                                <select class="form-control" formControlName="role" required id="role">
+                                    <option value="" disabled selected>Choose role</option>
+                                    <option value="STUDENT">Student</option>
+                                    <option value="TUTOR">Tutor</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2" *ngIf="showMajor">
+                                <select class="form-control" formControlName="major" required id="major">
+                                    <option value="" disabled selected>Choose major</option>
+                                    <option *ngFor="let major of majors"  [value]="major.id">
+                                        {{major.name}}
+                                    </option>
+                                </select>
+                            </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+
+                            <div *ngIf="showNotification" class="alert alert-danger mt-3">
+                                Please fill out all required fields.
+                            </div>  
+
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal" id="myModalUpdateUser" #myModalUpdateUser>
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">New User Account</h5>
+                <button type="button" class="btn-close" aria-label="Đóng" (click)="closeModalUpdate()"></button>
+            </div>
+            <div class="modal-body">
+                    <form  [formGroup]="userFormUpdate" (ngSubmit)="onSubmitUpdate()">
+                            <div class="mb-2">
+                                <input type="text" class="form-control" formControlName="username" id="usernameUpdate" placeholder="Username">
+                            </div>
+                            <div class="mb-2">
+                                <input class="form-control" formControlName="password" id="passwordUpdate" rows="2" placeholder="Password">
+                            </div>
+
+                            <div class="mb-2">
+                                <input class="form-control" formControlName="email" id="emailUpdate" rows="2" placeholder="Email">
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-success">Update</button>
+                            </div>
+
+                            <div *ngIf="showNotification" class="alert alert-danger mt-3">
+                                Please fill out all required fields.
+                            </div>  
+
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>

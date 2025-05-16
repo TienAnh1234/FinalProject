@@ -1,0 +1,50 @@
+.profile-container {
+    margin-top: 50px;
+    text-align: center;
+  }
+
+  .profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #0d6efd;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+
+  .username {
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+
+  .info-label {
+    font-weight: 500;
+    color: #555;
+  }
+
+  .card {
+    margin-top: 30px;
+  }
+
+  .post-card {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .post-image {
+    max-height: 300px;
+    object-fit: cover;
+  }

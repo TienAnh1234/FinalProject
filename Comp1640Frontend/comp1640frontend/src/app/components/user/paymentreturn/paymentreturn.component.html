@@ -1,0 +1,18 @@
+<div *ngIf="result" class="container mt-4">
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header bg-primary text-white rounded-top-4">
+      <h5 class="mb-0">Thông tin đơn hàng</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Exchange code:</strong> {{ result.transactionId }}</p>
+      <p><strong>Exchange information:</strong> {{ result.orderInfo }}</p>
+      <p><strong>Time:</strong> {{ result.paymentTime }}</p>
+      <p><strong>Amount:</strong> 
+        <span class="text-success fw-bold">{{ result.totalPrice / 100 | number }} VND</span>
+      </p>
+        <div class="mt-4 text-end">
+        <button class="btn btn-outline-primary" (click)="backToMain()">🔙 Back to main</button>
+        </div>
+    </div>
+  </div>
+</div>

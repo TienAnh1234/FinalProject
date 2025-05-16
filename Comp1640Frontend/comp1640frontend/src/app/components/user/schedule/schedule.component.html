@@ -1,0 +1,163 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-3">Lịch Học</h2>
+
+  <div class="row mb-3 justify-content-center">
+    <div class="col-auto">
+      <label for="weekPicker" class="form-label fw-bold">Chọn Tuần:</label>
+    </div>
+    <div class="col-auto">
+      <input id="weekPicker" type="week" class="form-control" [(ngModel)]="selectedWeek" (change)="onWeekChange($event)">
+    </div>
+    <div class="col-auto" *ngIf="userHold.role === 'TUTOR'">
+      <button class="btn btn-primary" (click)="showBookScheduleForm()">Book Schedule</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Thời Gian</th>
+          <th *ngFor="let day of days">{{ day }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let slot of fixedTimeSlots">
+          <td class="fw-bold">{{ slot.start + ' - ' + slot.end }}</td>
+          <td *ngFor="let day of days">
+
+            <div *ngIf="getScheduleForSlotAndDay(slot.start, day) !== null && userHold.role === 'TUTOR'" (click) =" showDetailSchedule( getScheduleForSlotAndDay(slot.start, day)  ) ">
+              <p class="hover-text fw-bold">{{ getScheduleForSlotAndDay(slot.start, day).studentDto?.name }}</p> <br>
+            </div>
+
+            <div *ngIf="getScheduleForSlotAndDay(slot.start, day) !== null && userHold.role === 'STUDENT'" (click) =" showDetailSchedule( getScheduleForSlotAndDay(slot.start, day)  ) ">
+              <p class="hover-text fw-bold">{{ getScheduleForSlotAndDay(slot.start, day).tutorDto?.name }}</p> <br>
+            </div>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="modal" id="myModalBookSchedule" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true" #myModalBookSchedule>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h2 class="modal-title fs-5" id="scheduleModalLabel">Book schedule</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModalBookSchedule()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="scheduleForm" (ngSubmit)="saveSchedule()">
+
+          <!-- Dropdown chọn học viên -->
+          <div class="mb-3" *ngIf="studentsOfTutor">
+            <label class="form-label">Choose student:</label>
+            <select class="form-select" name="studentId" required formControlName="studentDtoId" (change)="getListScheduleOfStudent()">
+              <option *ngFor="let student of studentsOfTutor" [value]="student.id">
+                {{ student.name }}
+              </option> 
+            </select>
+          </div>
+
+
+          <div class="mb-3">
+            <label class="form-label">Choose day:</label>
+            <input type="date" formControlName="startDay" class="form-control" required>
+          </div>
+
+          <div class="mb-3" *ngIf = "scheduleForm.get('startDay')?.value">
+            <label class="form-label">Choose hour:</label>
+            <select class="form-select" formControlName="startTime" (change)="findRemainRoomThisSlot()">
+              <option *ngFor="let slot of fixedTimeSlots" [value]="slot.start">
+                {{ slot.start }} - {{ slot.end }}
+              </option>
+            </select>
+          </div>
+
+
+          <div class="mb-3">
+            <label class="form-label">Schedule format:</label>
+            <select class="form-select"  required formControlName="scheduleFormat">
+              <option value="" disabled selected>Choose Type Schedule</option>
+              <option value="ONLINE" >ONLINE</option>
+              <option value="OFFLINE">OFFLINE</option>
+            </select>
+          </div>
+
+          <div *ngIf = "scheduleForm.get('scheduleFormat')?.value === 'OFFLINE'">
+            <!-- <select class="form-select"  required formControlName="address">
+              <option value="" disabled selected>Choose room</option>
+              <option *ngFor="let room of rooms" [value]="room">
+                {{room}}
+              </option>
+            </select> -->
+
+            <input type="text" class="form-control mt-3" placeholder="Address" formControlName="address">
+          </div>
+
+          <!-- <div *ngIf = "scheduleForm.get('scheduleFormat')?.value === 'ONLINE'">
+            <input type="text" class="form-control mt-3" placeholder="Link meetting" formControlName="address">
+          </div> -->
+
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="oneMonthCheckbox" (change)="onCheckboxChange($event)">
+            <label class="form-check-label" for="oneMonthCheckbox">
+              1 month
+            </label>
+          </div>
+
+
+          <button type="submit" class="btn btn-success w-100">Book Schedule</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div  class="modal" id="myModalScheduleDetail" tabindex="-1" aria-labelledby="" aria-hidden="true" #myModalScheduleDetail>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Schedule detail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModalScheduleDetail()"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="scheduleDetail">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Student:</strong> {{ scheduleDetail.studentDto?.username }}</li>
+          <li class="list-group-item"><strong>Tutor:</strong> {{ scheduleDetail.tutorDto?.username }}</li>
+          <li class="list-group-item"><strong>Start at:</strong> {{ scheduleDetail.startTime | date:'dd/MM/yyyy HH:mm' }}</li>
+          <li class="list-group-item"><strong>End at:</strong> {{ scheduleDetail.endTime | date:'dd/MM/yyyy HH:mm' }}</li>
+          <li *ngIf="scheduleDetail.scheduleFormat === 'OFFLINE'" class="list-group-item"><strong>Day:</strong> {{ scheduleDetail.dayOfWeek }}</li>
+
+          <li class="list-group-item" *ngIf="scheduleDetail.scheduleFormat === 'ONLINE'">
+          <strong>Address:</strong> 
+          <a href="{{ scheduleDetail.address }}" target="_blank">{{ scheduleDetail.address }}</a>
+          </li>
+
+
+          <li class="list-group-item"><strong>Address:</strong> {{ scheduleDetail.address }}</li>
+          <li class="list-group-item"><strong>Week:</strong> {{ scheduleDetail.weekOfYear }}</li>
+          <li class="list-group-item"><strong>Status:</strong> {{ scheduleDetail.status }}</li>
+        </ul>
+
+        <div class="mt-3 d-flex justify-content-between align-items-center" *ngIf="userHold.role === 'TUTOR'">
+          <select class="form-select w-50 me-2" [(ngModel)]="scheduleDetail.status">
+            <option value="" disabled>Chọn trạng thái</option>
+            <option value="Attended">Attended</option>
+            <option value="Absent">Absent</option>
+          </select>
+
+          <button class="btn btn-warning me-2" (click) = "updateStatusSchedule(scheduleDetail)">Set Status</button>
+          <button class="btn btn-danger" (click) = "deteteSchedule(scheduleDetail)">Delete</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

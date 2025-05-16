@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tìm kiếm người dùng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .user-card {
+      transition: box-shadow 0.3s ease;
+    }
+
+    .user-card:hover {
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h3 class="mb-4">🔍 Find user</h3>
+
+    <div class="input-group mb-4">
+      <input type="text" class="form-control" placeholder="Enter name..." id="searchInput" [(ngModel)]="searchTutorOrStudent.username">
+      <select class="form-select" id="locationSelect" [(ngModel)]="searchTutorOrStudent.districtId"> 
+        <option [ngValue]="null">All</option>
+        <option *ngFor="let district of districts" [value]="district.id">
+          {{district.name}}
+        </option>
+      </select>
+
+
+        <select *ngIf="userHold.role === 'STUDENT'" class="form-select" id="gradeSelect"  [(ngModel)]="searchTutorOrStudent.gradeId"  (change)="findMajorByGradeId(searchTutorOrStudent.gradeId!)">
+          <option [ngValue]="null" >All</option>
+          <option [ngValue]="grade.id" *ngFor="let grade of grades" [value]="grade.id">
+            {{grade.name}}
+          </option>
+        </select>
+
+        <select *ngIf="userHold.role === 'STUDENT'" class="form-select" id="majorSelect"  [(ngModel)]="searchTutorOrStudent.majorId">
+          <option [ngValue]="null" >All</option>
+          <option [ngValue]="major.id" *ngFor="let major of filterMajorsById" [value]="major.id" >
+            {{major.name}}
+          </option>
+        </select>
+
+      <button class="btn btn-outline-secondary" type="button" (click)="findStudentOrTutor()">Search</button>
+    </div>
+
+    <div class="row" id="userList">
+
+      <ng-container *ngIf="userHold.role === 'TUTOR'">
+        <div class="col-md-4 mb-3 user-item" *ngFor="let user of studentsOnly">
+          <div class="card user-card p-3" >
+            <img 
+            [src]="findObjectByUsername(user.username!, user.role!).imageFile" 
+            alt="User Avatar" 
+            class="rounded-circle me-3" 
+            width="60" 
+            height="60"
+            (click)="checkThisGuy(user)"
+          />
+            <h5 class="card-title">{{findObjectByUsername(user.username!, user.role!).name}}</h5>
+            <p class="card-text">{{user.email}}</p>
+            <p class="card-text">{{user.role}}</p>
+            
+            <div *ngIf="checkAddFriendRequest(user) === false ;else checkElse">
+              <button class="btn btn-primary btn-sm"  (click)="sendAddFriendRequest(user.username!)" >Add friend</button>
+            </div>
+
+            <ng-template #checkElse>
+              <p class="card-text">You've sent request to this guy</p>
+            </ng-template>
+
+
+            </div>
+        </div>
+      </ng-container>
+
+
+      <!-- Thẻ người dùng mẫu -->
+      <ng-container *ngIf="userHold.role === 'STUDENT'">
+        <div class="col-md-4 mb-3 user-item" *ngFor="let user of tutorsOnly">
+          <div class="card user-card p-3">
+            <img 
+            [src]="findObjectByUsername(user.username!, user.role!).imageFile" 
+            alt="User Avatar" 
+            class="rounded-circle me-3" 
+            width="60" 
+            height="60"
+            (click)="checkThisGuy(user)"
+          />
+            <h5 class="card-title">{{findObjectByUsername(user.username!, user.role!).name}}</h5>
+            <p class="card-text">{{user.email}}</p>
+            <p class="card-text">{{user.role}}</p>
+
+            <div *ngIf="checkAddFriendRequest(user) === false ;else checkElse">
+              <button class="btn btn-primary btn-sm"  (click)="sendAddFriendRequest(user.username!)" >Add friend</button>
+            </div>
+
+            <ng-template #checkElse>
+              <p class="card-text">You've sent request to this guy</p>
+            </ng-template>
+
+
+          </div>
+        </div>
+      </ng-container>
+
+
+    </div>
+  </div>
+
+
+</body>
+</html>

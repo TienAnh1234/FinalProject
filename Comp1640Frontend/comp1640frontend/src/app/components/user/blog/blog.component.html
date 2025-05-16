@@ -1,0 +1,367 @@
+<div class="container mt-4">
+
+  <!-- Header kiểu website hiện đại -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm py-3 px-4">
+    <div class="container-fluid">
+      <!-- Logo hoặc tên trang -->
+      <a class="navbar-brand fw-bold text-primary">MySocial</a>
+
+      <!-- Menu toggle trên mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Menu điều hướng -->
+      <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
+        <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+
+          <li class="nav-item position-relative" 
+          (mouseenter)="showRequests = true" 
+          (mouseleave)="showRequests = false" 
+          style="position: relative;">
+          
+        <a class="nav-link position-relative" href="#">
+          <i class="bi bi-person-plus-fill"></i> My Request
+          <span *ngIf="addFriendRequestsIReceived.length > 0" 
+                class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle">
+            {{ addFriendRequestsIReceived.length }}
+          </span>
+        </a>
+      
+        <!-- Dropdown content -->
+        <div *ngIf="showRequests"
+             class="shadow rounded-3 bg-white border p-3"
+             style="position: absolute; top: 100%; right: 0; min-width: 300px; max-height: 400px; overflow-y: auto; z-index: 1000;">
+          
+          <h6 class="mb-2 border-bottom pb-1">Friend Requests</h6>
+      
+          <div *ngIf="addFriendRequestsIReceived.length === 0" class="text-muted small text-center">
+            You dont have friend request
+          </div>
+      
+          <div *ngFor="let request of addFriendRequestsIReceived" class="d-flex justify-content-between align-items-center border-bottom py-2">
+            <div>
+              <strong (click)="checkThisGuy(findUserByUsername(request.sender))">{{ request.sender }}</strong><br>
+              <small class="text-muted">đã gửi lời mời</small>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-success" (click)="acceptRequest(request)">✔</button>
+              <button class="btn btn-outline-danger" (click)="declineRequest(request)">✖</button>
+            </div>
+          </div>
+        </div>
+      </li>
+      
+
+
+          <li class="nav-item" *ngIf="userHold.role === 'STUDENT'">
+            <a class="nav-link" (click)="findUser()">Find Tutors</a>
+          </li>
+
+          <li class="nav-item" *ngIf="userHold.role === 'TUTOR' && userHold.status ==='PRIME'">
+            <a class="nav-link" (click)="findUser()">Find Students</a>
+          </li>
+          <li class="nav-item" *ngIf="userHold.role === 'TUTOR'">
+            <a class="nav-link" (click)="openByPrimeComponent()">Prime</a>
+          </li>
+          <li class="nav-item" *ngIf="userHold.role === 'TUTOR' && userHold.status ==='PRIME' || userHold.role === 'STUDENT'">
+            <a class="nav-link" (click)="openScheduleComponent()">My Schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="openMyBlogComponent()">My Blogs</a>
+          </li>
+
+          
+          <li class="nav-item ms-3">
+            <a class="nav-link text-danger fw-semibold" (click)="logoutUser()">Logout</a>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+
+
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <img src="{{userHold.imageFile}}" class="rounded-circle mb-3" width="80" height="80" alt="Profile picture">
+            <h5 class="card-title">{{ userHold.username }}</h5>
+            <span class="badge bg-warning text-dark mb-2 px-3 py-1 rounded-pill" style="font-weight: bold;" *ngIf="userHold.status === 'PRIME'">
+              PRIME
+            </span>
+            <div class="text-muted small mt-1" *ngIf="userHold.status === 'PRIME'"  >
+              {{ findPaymentByTutorId(userHold.idStudentOfTutor!).startTime | date: 'dd/MM/yyyy' }} - {{ findPaymentByTutorId(userHold.idStudentOfTutor!).endTime | date: 'dd/MM/yyyy' }}
+            </div>
+            <span class="badge bg-secondary text-light mb-2 px-3 py-1 rounded-pill" style="opacity: 0.6;"  *ngIf="userHold.status === 'WAITTING'">
+              Non Prime
+            </span>
+          </div>
+        </div>
+
+        <div class="card mb-4"> 
+
+          <div *ngIf="userHold.role === 'TUTOR'">
+            <button class="btn btn-info mt-2 w-100" (click)="checkShowListStudentOrTutorOutSide()">My Students</button>
+            <div *ngIf="showListStudentsOfTutorOutSide" class="mt-3">
+              <h6 class="text-center"></h6>
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let student of studentsOfTutor">
+                  <span>{{ student.name }}</span>
+                  <div class="position-relative d-inline-block">
+                    <button class="btn btn-primary btn-sm me-2" (click)="setRecipientMessage(student.username!)">
+                      Chat
+
+                      <span *ngIf="newMessage.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ newMessage.length }}
+                      </span>
+
+
+                    </button>
+                  </div>
+
+                  <button class="btn btn-danger btn-sm" (click)="deleteClassroomByStudentIdAndTutorId(student.id!)">
+                    Delete
+                  </button>
+
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+
+
+          <div *ngIf="userHold.role === 'STUDENT'">
+            <button class="btn btn-info mt-2 w-100" (click)="checkShowListStudentOrTutorOutSide()">My Tutors</button>
+            <div *ngIf="showListStudentsOfTutorOutSide" class="mt-3">
+              <h6 class="text-center"></h6>
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let tutor of tutorsOfStudent">
+                  <span>{{ tutor.name }}</span>
+                    <div class="position-relative d-inline-block">
+                      <button class="btn btn-primary btn-sm me-2" (click)="setRecipientMessage(tutor.username!)">
+                        Chat
+                        <span *ngIf="newMessage.length > 0"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                          {{ newMessage.length }}
+                        </span>
+
+                      <!-- <span *ngIf="countNewMessage(tutor.username!) > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ countNewMessage(tutor.username!) }}
+                      </span> -->
+
+
+                      </button>
+                    </div>
+                    
+                    <button class="btn btn-danger btn-sm" (click)="deleteClassroomByStudentIdAndTutorId(tutor.id!)">
+                      Delete
+                    </button>
+
+                  
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+
+        </div>
+      </div>
+
+      <!-- Blog Content -->
+      <div class="col-lg-8">
+
+        <div class="card mb-4" *ngIf="userHold.role === 'TUTOR' && userHold.status ==='PRIME' || userHold.role === 'STUDENT'">
+          <div class="card-body">
+            <h5 class="card-title">Create a Post</h5>
+            <textarea class="form-control mb-3" rows="4" [(ngModel)]="content" placeholder="What's on your mind?"></textarea>
+            <!-- <input type="file" class="form-control mb-3" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" /> -->
+            <input type="file" class="form-control mb-3" (change)="onFileSelected($event)" #fileInput>
+            <button class="btn btn-primary" (click)="saveBlog()">Post</button>
+          </div>
+        </div>
+
+        <div *ngFor="let blog of blogs" class="card mb-4 shadow-sm border-0">
+          <div class="card-body">
+            <!-- Author Info -->
+            <div class="d-flex align-items-center mb-3">
+              <img [src]="findObjectByUser(blog.userDto!)?.imageFile" class="rounded-circle border" width="50" height="50" alt="Author" (click)="checkThisGuy(blog.userDto!)">
+              <div class="ms-3">
+                <h6 class="fw-bold text-primary mb-0">{{ findObjectByUser(blog.userDto!)?.name }}</h6>
+                <p class="text-muted small mb-0">{{ blog.createdAt!.toString().split('.')[0].replace('T', ' ') }}</p>
+              </div>
+            </div>
+        
+            <!-- Blog Content -->
+            <p class="fs-6 text-secondary">{{ blog.content }}</p>
+        
+            <!-- Nếu blog có file đính kèm -->
+            <div *ngIf="blog.fileName" class="mb-2">
+              <span class="text-muted">
+                📎 <strong>{{ blog.fileName }}</strong>
+              </span>
+              <a class="btn btn-outline-secondary btn-sm ms-2"
+                [href]="'http://localhost:8080/api/blog/download/' + blog.id"
+                target="_blank"
+                download>
+                Tải xuống
+              </a>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <!-- Like Button -->
+              <button class="btn btn-primary btn-sm d-flex align-items-center me-3" (click)="toggleLike(blog.id!)">
+                <i class="fas fa-thumbs-up me-2"></i> {{ blog.likeCount }}
+              </button>
+        
+              <!-- <button class="btn btn-secondary btn-sm d-flex align-items-center me-3">
+                <i class="fas fa-comment me-2"></i> Comment
+              </button> -->
+        
+              <button class="btn btn-success btn-sm d-flex align-items-center" (click)="showComment(blog.id!)">
+                <i class="fa fa-comment"></i>
+              </button>
+            </div>
+        
+            <!-- Comment Input -->
+            <div class="mt-4">
+              <input type="text"  (change)="handleInput($event)" class="form-control form-control-sm" placeholder="Write a comment..." style="border-radius: 20px;">
+              <button class="btn btn-primary btn-sm mt-2" (click)="submitComment(blog.id!)">Comment</button>
+            </div>
+
+            <div *ngIf="visibleComments.has(blog.id!)">
+              <div *ngFor="let comment of blog.comments" class="mt-2 ms-3 d-flex align-items-start">
+                
+                <!-- Hiển thị ảnh người dùng -->
+                <img [src]="findObjectByUsername(findUsernameById(comment.userId!)).imageFile" 
+                     class="rounded-circle" width="40" height="40" alt="User Image" />
+            
+                <div class="ms-3">
+                  <!-- Tên người dùng -->
+                  <strong class="text-primary">{{ findUsernameById(comment.userId!) }}</strong>
+                  
+                  <!-- Nội dung bình luận -->
+                  <p class="mb-1">{{ comment.content }}</p>
+                  
+                  <!-- Ngày tạo comment -->
+                  <div class="text-muted small">{{ comment.createdAt | date:'short' }}</div>
+            
+                  <!-- Các nút chỉnh sửa và xóa -->
+                  <div class="mt-2"  *ngIf="findUsernameById(comment.userId!) === userHold.username">
+                    <button class="btn btn-outline-secondary btn-sm" (click)="showUpdateCommentModal(comment)">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" (click)="deleteComment(comment)">
+                      <i class="fas fa-times"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          
+
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+
+
+  <div class="modal" id="myModalUpdateUser" #myModalUpdateUser>
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Update information</h5>
+                <button type="button" class="btn-close" aria-label="Đóng" (click)="closeModalUpdate()"></button>
+            </div>
+            <div class="modal-body">
+                    <form  [formGroup]="userFormUpdate" (ngSubmit)="onSubmitUpdate()">
+                            <div class="mb-2">
+                                <input type="text" class="form-control" formControlName="nameUpdate" placeholder="Name update">
+                            </div>
+                            <div class="mb-2">
+                                <input  type="date" class="form-control" formControlName="birthdayUpdate" id="birthday" rows="2" placeholder="Birthday">
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="imageFileUpdate">Image</label><br>
+                                <input type="file" id="imageFileUpdate" class="form-control" (change)="onFileSelected($event)">
+                            </div>
+                            <div class="mb-2">
+                                <select class="form-control" formControlName="majorUpdate" required>
+                                    <option value="" disabled selected>Choose major</option>
+                                    <option *ngFor="let major of majors"  [value]="major.id">
+                                        {{major.name}}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-success">Update</button>
+                            </div>
+
+                            <div *ngIf="showNotification" class="alert alert-danger mt-3">
+                                Please fill out all required fields.
+                            </div>  
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal" id="myModalChatting" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true" #myModalChatting>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="chatModalLabel">Chat</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModalChatting()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="chat-box border rounded p-2" style="height: 300px; overflow-y: auto;">
+          <div *ngFor="let wbschatmessage of wbschatmessages">
+
+            <div *ngIf="wbschatmessage.sender === recipientName" class="d-flex justify-content-start mb-2">
+                <div class="alert alert-secondary">{{wbschatmessage.content}} </div>
+            </div>
+
+            <div *ngIf="wbschatmessage.sender === userHold.username" class="d-flex justify-content-end mb-2">
+                <div class="alert alert-primary">{{wbschatmessage.content}} </div>
+            </div>
+
+        </div>
+        </div>
+        <div class="input-group mt-3">
+          <input type="text" class="form-control" [(ngModel)]="message" placeholder="Type a message...">
+          <button class="btn btn-primary" (click) = "sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal chỉnh sửa comment -->
+<div class="modal"  id="myModalUpdateComment" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true" #myModalUpdateComment>
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit your comment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng" (click)="closeModalUpdateComment()"></button>
+      </div>
+      <div class="modal-body">
+        <textarea rows="3" class="form-control" [(ngModel)]="holdContentComment"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" (click)="updateComment()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

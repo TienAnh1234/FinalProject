@@ -1,0 +1,141 @@
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Manage Classroom</h2>
+    
+        <!-- Phần chọn chuyên ngành và tạo lớp học -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-12 mb-3">
+                        <label for="majorSelect" class="form-label">Choose major</label>
+                        <select class="form-select" id="majorSelect" (change)="chooseMajor($event)">
+                            <option value="" disabled selected>Major</option>
+                            <option *ngFor="let major of majors"  [value]="major.id">
+                                {{major.name}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3" *ngIf="showTutor">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">Tutor list</div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tutor name</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let tutor of filteredTutors">
+                                            <td>{{tutor.name}}</td>
+                                            <td><button class="btn btn-success btn-sm" (click)="chooseTutor(tutor)"
+                                                [disabled]="tutorChoosed?.id == tutor.id">
+                                                {{ tutorChoosed?.id == tutor.id ? "Added" : "Add" }}</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3" *ngIf="showStudent">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">Student list</div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Student name</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let student of filteredStudents  | paginate: { itemsPerPage: 5, currentPage: currentPageStudent }">
+                                            <td>{{student.name}}</td>
+                                            <td><button class="btn btn-success btn-sm"                                         
+                                                (click)="chooseStudent(student)"
+                                                [disabled]="studentsChoosed.includes(student)">
+                                                {{ studentsChoosed.includes(student) ? "Added" : "Add" }}</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <pagination-controls (pageChange)="currentPageStudent = $event"></pagination-controls>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hiển thị thông tin lớp học sắp tạo -->
+                    <div class="col-md-12 mt-3" *ngIf="tutorChoosed || studentsChoosed.length > 0">
+                        <div class="card h-100 shadow-lg border-0 rounded-3">
+                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                                <span>Classroom Information</span>
+                                <button 
+                                    class="btn btn-close btn-light" 
+                                    (click)="closeClassroomInfo()"
+                                    title="Close">
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="text-center fw-bold">Classroom of: {{ tutorChoosed!.name }}  - {{ tutorChoosed!.majorDto?.name }}</h5>
+                                <hr>
+                                <h6 class="fw-bold">Selected Tutor:</h6>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p *ngIf="tutorChoosed" class="text-primary">{{ tutorChoosed.name }} </p>
+                                </div>
+
+                                <p *ngIf="!tutorChoosed" class="text-muted">No tutor selected</p>
+
+                                <h6 class="fw-bold">Selected Students:</h6>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between" *ngFor="let student of studentsChoosed">
+                                        {{ student.name }}
+                                        <button class="btn btn-danger btn-sm" (click)="removeStudent(student)">Remove</button>
+                                    </li>
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7 mb-3">
+                        <button *ngIf="isCreateOrUpdateMode" class="btn btn-primary w-100 mt-2" (click)="createClass()">Create classroom</button>
+                        <button *ngIf="!isCreateOrUpdateMode" class="btn btn-primary w-100 mt-2" (click)="updateClass()">Update classroom</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-center mb-4">List Classroom</h3>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3" *ngFor="let tutor of tutorExisted">
+                        <div class="card h-100">
+                            <div class="card h-100 shadow-lg border-0 rounded-3" (click)="openUpdateClassroom(tutor)">
+                                <div class="card-body text-center">
+                                  <h5 class="card-title fw-bold">{{ tutor.name }}</h5>
+                                  <button class="btn btn-primary" (click)="deleteClassOfTutor(tutor)">Delete class of {{ tutor.name }} </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+    
+

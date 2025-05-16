@@ -1,0 +1,79 @@
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Majors</h3>
+        <button class="btn btn-primary" (click)="openModal()">+ Create majors</button>
+    </div>
+
+    <table class="table table-bordered table-hover shadow">
+        <thead class="table-dark">
+            <tr>
+                <th>No</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dữ liệu mẫu -->
+            <tr *ngFor ="let major of majors; let i = index ">
+                <td>{{i + 1}}</td>
+                <td>{{major.name}}</td>
+                <td>{{major.description}}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm me-2" (click)="updateMajor(major)">
+                        Update
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteMajor(major)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+
+
+<div class="modal" id="myModal" #myModal>
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">New Major</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng" (click)="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                    <form (ngSubmit)="onSubmit()" [formGroup]="majorForm">
+                        <div class="mb-2">
+                            <input type="text" class="form-control" formControlName="name" id="majorName" placeholder="Name">
+                        </div>
+                        <div class="mb-2">
+                            <textarea class="form-control" formControlName="description" id="description" rows="2" placeholder="Description"></textarea>
+                        </div>
+
+                        <div *ngIf="checkSaveOrUpdate == 0">
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-success">Save</button>
+                            </div>
+                        </div>
+
+                        <div *ngIf="checkSaveOrUpdate == 1">
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-success">Update</button>
+                            </div>
+                        </div>
+
+                    </form>
+                
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+

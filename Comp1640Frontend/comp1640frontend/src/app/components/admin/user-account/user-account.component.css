@@ -1,0 +1,44 @@
+.search-bar {
+    position: relative;
+    width: 100%;
+}
+.search-bar input {
+    width: 100%;
+    padding: 12px 40px 12px 20px;
+    border-radius: 25px;
+    border: 1px solid #ced4da;
+    font-size: 16px;
+}
+.search-bar input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.search-bar .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #007bff;
+}
+.search-bar button {
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+.search-bar button:hover {
+    background-color: #0056b3;
+}
+
+.clickable-cell {
+    cursor: pointer;               /* Biến con trỏ thành dạng "bàn tay" */
+    transition: background 0.3s;   /* Hiệu ứng mượt khi đổi màu */
+  }
+  
+  .clickable-cell:hover {
+    background-color: #f0f0f0;     /* Đổi màu nền khi hover */
+    text-decoration: underline;    /* Tuỳ chọn: gạch chân chữ khi hover */
+  }

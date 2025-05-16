@@ -1,0 +1,28 @@
+
+  <div class="container my-5">
+    <h2 class="mb-4">Approving blogs</h2>
+
+
+    <div *ngFor="let blog of blogs" class="card mb-3">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">
+            User: {{ blog.userDto?.username }}
+        </h6>
+        <p class="card-text">{{blog.content}}</p>
+
+        <div *ngIf="blog.fileName">
+            <span class="text-muted">📎 <strong>{{ blog.fileName }}</strong></span>
+            <a class="btn btn-outline-secondary btn-sm ms-2"
+               [href]="'http://localhost:8080/api/blog/download/' + blog.id"
+               target="_blank"
+               download>
+              Tải xuống
+            </a>
+        </div>
+
+        <button class="btn btn-success" (click) = "approveBlog(blog)">Approve</button>
+      </div>
+    </div>
+
+  </div>
+
